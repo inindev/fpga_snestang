@@ -180,7 +180,21 @@ set_option -synthesis_tool gowinsynthesis
 set_option -top_module snestang_top
 set_option -verilog_std sysv2017
 set_option -rw_check_on_ram 1
-set_option -place_option 2
+# Placement and routing algorithms, chosen for timing (as in fpga_game_consoles). The HDMI
+# encoder path (hclk, 74.25 MHz) has little margin, so which combination passes depends on
+# the build: Gowin 1.9.11.03 accepts place 0-2 and route 0-2. RF_PLACE and RF_ROUTE override
+# them. Small design changes move placement, so check hclk in the timing report after each.
+set place_option 2
+set route_option 0
+if {$dev eq "nano20k"} {
+    # fpga_game_consoles' SNES default: hclk 74.59 MHz (2026-11-02); 2/0 reached 70.57
+    set place_option 0
+    set route_option 2
+}
+if {[info exists ::env(RF_PLACE)]} { set place_option $::env(RF_PLACE) }
+if {[info exists ::env(RF_ROUTE)]} { set route_option $::env(RF_ROUTE) }
+set_option -place_option $place_option
+set_option -route_option $route_option
 set_option -use_mspi_as_gpio 1
 set_option -use_sspi_as_gpio 1
 set_option -use_ready_as_gpio 1
