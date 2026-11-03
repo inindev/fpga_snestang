@@ -191,6 +191,11 @@ if {$dev eq "nano20k"} {
     set place_option 0
     set route_option 2
 }
+if {$dev eq "console138k"} {
+    # with the menu pause: hclk 74.82 MHz (2026-11-03); 2/0 reached 73.18, 0/2 73.35
+    set place_option 1
+    set route_option 1
+}
 if {[info exists ::env(RF_PLACE)]} { set place_option $::env(RF_PLACE) }
 if {[info exists ::env(RF_ROUTE)]} { set route_option $::env(RF_ROUTE) }
 set_option -place_option $place_option

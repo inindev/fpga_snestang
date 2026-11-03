@@ -71,7 +71,9 @@ always @(posedge clk) begin
 end
 
 // Frame lock. The pause lasts an even number of cycles (pause_sync) so that the PPU's
-// SDRAM accesses stay in step.
+// SDRAM accesses stay in step. While the menu is shown the pause is not released, so the
+// game holds at line 1 of its next frame; go is cleared meanwhile, so the game resumes on
+// the frame_go after the menu closes, in step with HDMI.
 wire frame_go;
 reg  locked = 0;                        // paused once this frame
 reg  go;                                // frame_go seen during this pause
@@ -89,12 +91,13 @@ always @(posedge clk) begin
                     pause_sync <= 1'b0;
                     go <= 1'b0;
                 end
-            end else if (go && pause_sync) begin
+            end else if (go && pause_sync && ~overlay) begin
                 pause <= 1'b0;
                 locked <= 1'b1;
             end
         end
-        if (frame_go) go <= 1'b1;
+        if (overlay) go <= 1'b0;
+        else if (frame_go) go <= 1'b1;
         if (ys[7:0] == REARM_LINE) locked <= 1'b0;
     end
 end
@@ -142,7 +145,8 @@ dual_clk_fifo #(.DATESIZE(32), .ADDRSIZE(4)) audio_fifo (
 video_out #(.PIX_FMT(0), .DW(15), .AUDIO_RATE(AUDIO_RATE)) video (
     .clk(clk), .resetn(resetn),
     .pix_we(pix_we), .pix_y(pix_y), .pix_x(pix_x), .pix_data(pix_data),
-    .src_lines(src_lines), .src_active(running), .shape(shape), .frame_go(frame_go),
+    // no game under the menu: the paused game would leave only the 16-line ring buffer
+    .src_lines(src_lines), .src_active(running & ~overlay), .shape(shape), .frame_go(frame_go),
     .overlay(overlay),
     .hclk(hclk), .hclk5(hclk5),
     .clk_audio(clk_audio), .audio_l(audio_out_l), .audio_r(audio_out_r),
