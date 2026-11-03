@@ -17,7 +17,6 @@ if {$argc >= 2} {
 if {$dev eq "nano20k"} {
     set_device GW2AR-LV18QN88C8/I7 -device_version C
     add_file src/boards/nano20k.v
-    add_file -type verilog "src/snes2hdmi_nano.v"
     add_file -type cst "src/boards/nano20k.cst"
     add_file -type verilog "src/pllr/gowin_pll_hdmi.v"
     add_file -type verilog "src/pllr/gowin_pll_snes.v"
@@ -35,7 +34,6 @@ if {$dev eq "nano20k"} {
     } else {
         error "Unknown controller $controller"
     }
-    add_file -type verilog "src/snes2hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_27.v"
     add_file -type verilog "src/plla/gowin_pll_hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_snes.v"
@@ -54,7 +52,6 @@ if {$dev eq "nano20k"} {
     } else {
         error "Unknown controller $controller"
     }
-    add_file -type verilog "src/snes2hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_27.v"
     add_file -type verilog "src/plla/gowin_pll_hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_snes.v"
@@ -71,7 +68,6 @@ if {$dev eq "nano20k"} {
     } else {
         error "Unknown controller $controller"
     }
-    add_file -type verilog "src/snes2hdmi.v"
     add_file -type verilog "src/pll/gowin_pll_27.v"
     add_file -type verilog "src/pll/gowin_pll_hdmi.v"
     add_file -type verilog "src/pll/gowin_pll_snes.v"
@@ -83,14 +79,13 @@ if {$dev eq "nano20k"} {
     set_device GW5AT-LV60PG484AC1/I0 -device_version B
     if {$controller eq "snes"} {
         add_file src/boards/console60k_snescontroller.v
-        add_file -type cst "src/boards/console60k_snescontroller.cst"
+        add_file -type cst "src/boards/console_snescontroller.cst"
     } elseif {$controller eq "ds2"} {
         add_file src/boards/console60k.v
         add_file -type cst "src/boards/console.cst"
     } else {
         error "Unknown controller $controller"
     }
-    add_file -type verilog "src/snes2hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_27.v"
     add_file -type verilog "src/plla/gowin_pll_hdmi.v"
     add_file -type verilog "src/plla/gowin_pll_snes.v"
@@ -102,7 +97,6 @@ if {$dev eq "nano20k"} {
     set_device GW5AST-LV138PG484AC1/I0 -device_version B
     add_file src/boards/console138k.v
     add_file -type cst "src/boards/console.cst"
-    add_file -type verilog "src/snes2hdmi.v"
     add_file -type verilog "src/pll/gowin_pll_27.v"
     add_file -type verilog "src/pll/gowin_pll_hdmi.v"
     add_file -type verilog "src/pll/gowin_pll_snes.v"
@@ -140,6 +134,8 @@ add_file -type verilog "src/chip/DSP/dsp_data_ram.v"
 add_file -type verilog "src/cpu.v"
 add_file -type verilog "src/dsp.v"
 add_file -type verilog "src/dual_clk_fifo.v"
+add_file -type verilog "src/snes_video.v"
+add_file -type verilog "src/video_out.v"
 add_file -type verilog "src/dualshock_controller.v"
 add_file -type verilog "src/gowin_dpb_cgram.v"
 add_file -type verilog "src/gowin_dpb_hoam.v"

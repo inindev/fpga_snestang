@@ -7,6 +7,8 @@
 // `define CONTROLLER_SNES
 `define CONTROLLER_DS2
 
+`define VIDEO_OUT       // snestang_top.v: snes_video (line buffer, frame lock, 3x scaler)
+
 package configPackage;  
 
 localparam SDRAM_DATA_WIDTH = 16;

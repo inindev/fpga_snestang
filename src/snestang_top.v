@@ -606,6 +606,22 @@ wire [7:0] overlay_y;
 
 wire [7:0] dbg_dat_out_loader;
 
+`ifdef VIDEO_OUT
+// Nano 20K, Console 138K: line buffer, frame lock, 3x scaler and fixed menu window (snes_video.v)
+snes_video s2h (
+    .clk(mclk), .resetn(resetn), .running(loaded),
+    .dotclk(dotclk), .hblank(~hblankn), .vblank(~vblankn), .rgb5(rgb_out),
+    .xs(x_out), .ys(y_out), .snes_refresh(refresh),
+    .pause(pause_snes_for_frame_sync),
+    .audio_l(audio_l), .audio_r(audio_r), .audio_ready(audio_ready),
+    .shape(2'd0),               // 8:7 pixels
+    .overlay(overlay), .overlay_x(overlay_x), .overlay_y(overlay_y),
+    .overlay_color(overlay_color),
+    .hclk(hclk), .hclk5(hclk5),
+    .tmds_clk_n(tmds_clk_n), .tmds_clk_p(tmds_clk_p),
+    .tmds_d_n(tmds_d_n), .tmds_d_p(tmds_d_p)
+);
+`else
 snes2hdmi s2h(
     .clk(mclk), .resetn(resetn), .snes_refresh(refresh),
     .pause_snes_for_frame_sync(pause_snes_for_frame_sync),
@@ -618,6 +634,7 @@ snes2hdmi s2h(
     .tmds_clk_n(tmds_clk_n), .tmds_clk_p(tmds_clk_p),
     .tmds_d_n(tmds_d_n), .tmds_d_p(tmds_d_p)
 );
+`endif
 
 iosys_bl616 #(.CORE_ID(2), .FREQ(21_484_000)) iosys (
     .clk(mclk), .hclk(hclk), .resetn(resetn),

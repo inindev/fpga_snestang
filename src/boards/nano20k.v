@@ -9,6 +9,8 @@
 `define CONTROLLER_DS2
 `define CONTROLLER_SNES
 
+`define VIDEO_OUT       // snestang_top.v: snes_video (line buffer, frame lock, 3x scaler)
+
 // `define DISABLE_SNES
 // `define DISABLE_SMP
 

@@ -1,9 +1,13 @@
 
-`define PRIMER
+`define CONFIG_V
+
 `define SDRAM_3CH
 `define CHIP_DSPn
 // `define CHIP_GSU
 `define CONTROLLER_SNES
+`define USB1
+
+`define VIDEO_OUT       // snestang_top.v: snes_video (line buffer, frame lock, 3x scaler)
 
 package configPackage;  
 

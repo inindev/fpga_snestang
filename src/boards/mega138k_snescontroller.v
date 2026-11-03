@@ -8,6 +8,8 @@
 // `define DISABLE_SNES
 // `define DISABLE_SMP
 
+`define VIDEO_OUT       // snestang_top.v: snes_video (line buffer, frame lock, 3x scaler)
+
 package configPackage;  
 
 localparam SDRAM_DATA_WIDTH = 16;
