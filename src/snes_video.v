@@ -142,11 +142,23 @@ dual_clk_fifo #(.DATESIZE(32), .ADDRSIZE(4)) audio_fifo (
     .almost_full(), .almost_empty()
 );
 
-video_out #(.PIX_FMT(0), .DW(15), .AUDIO_RATE(AUDIO_RATE)) video (
+// With the frame buffer the paused game is shown under the menu; without it, the 16-line
+// ring buffer has no full picture, so there is no game under the menu.
+`ifdef VIDEO_FRAMEBUFFER
+localparam FRAMEBUFFER = 1;
+`else
+localparam FRAMEBUFFER = 0;
+`endif
+`ifdef VIDEO_FRAMEBUFFER_RGB15
+localparam FB_RGB15 = 1;               // full 15-bit color in the frame buffer
+`else
+localparam FB_RGB15 = 0;               // 12-bit
+`endif
+
+video_out #(.PIX_FMT(0), .DW(15), .AUDIO_RATE(AUDIO_RATE), .FRAMEBUFFER(FRAMEBUFFER), .FB_RGB15(FB_RGB15)) video (
     .clk(clk), .resetn(resetn),
     .pix_we(pix_we), .pix_y(pix_y), .pix_x(pix_x), .pix_data(pix_data),
-    // no game under the menu: the paused game would leave only the 16-line ring buffer
-    .src_lines(src_lines), .src_active(running & ~overlay), .shape(shape), .frame_go(frame_go),
+    .src_lines(src_lines), .src_active(running & (FRAMEBUFFER || ~overlay)), .shape(shape), .frame_go(frame_go),
     .overlay(overlay),
     .hclk(hclk), .hclk5(hclk5),
     .clk_audio(clk_audio), .audio_l(audio_out_l), .audio_r(audio_out_r),

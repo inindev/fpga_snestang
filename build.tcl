@@ -192,8 +192,11 @@ if {$dev eq "nano20k"} {
     set route_option 2
 }
 if {$dev eq "console138k"} {
-    # with the menu pause: hclk 74.82 MHz (2026-11-03); 2/0 reached 73.18, 0/2 73.35
-    set place_option 1
+    # with the menu header/footer textdisp (2026-11-03): 2/1 reached hclk 72.75 MHz (TNS
+    # -0.44 ns, closest; does not meet 74.24); 2/2 72.70, 2/0 72.69, 0/2 69.18, 1/1 68.31,
+    # 1/0 68.16. Before that change 1/1 met timing (74.82). The failing paths are in the HDMI
+    # encoder (tmds_channel).
+    set place_option 2
     set route_option 1
 }
 if {[info exists ::env(RF_PLACE)]} { set place_option $::env(RF_PLACE) }
