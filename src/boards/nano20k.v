@@ -1,4 +1,5 @@
 
+// Modified for tangcore (2026-11-04), from fpga_game_consoles: NANO20K added. See git history.
 `define CONFIG_V
 
 `define PLL_R
@@ -10,6 +11,7 @@
 `define CONTROLLER_SNES
 
 `define VIDEO_OUT       // snestang_top.v: snes_video (line buffer, frame lock, 3x scaler)
+`define NANO20K         // snestang_top.v: onboard RGB LED off, audio amp off
 
 // `define DISABLE_SNES
 // `define DISABLE_SMP
