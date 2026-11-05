@@ -27,3 +27,6 @@ set_multicycle_path 1 -hold -start -from [get_clocks {fclk}] -to [get_clocks {mc
 set_false_path -from [get_regs {main/SNES/smp/CPUO*}] -to [get_regs {sdram/dq_out*}]
 set_false_path -from [get_clocks {fclk}] -through [get_nets {main/SNES/smp/SPC700_D_IN*}] -to [get_clocks {fclk}]
 
+// Clock crossings: a register named *_meta is the first stage of a synchronizer (iosys's
+// UART input, usb_hid_sync's USB buttons). The path into it crosses clocks on purpose.
+set_false_path -to [get_regs {*_meta*}]
