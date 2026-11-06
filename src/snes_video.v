@@ -26,11 +26,13 @@ module snes_video (
     // DSP
     input      [15:0] audio_l,
     input      [15:0] audio_r,
+    input [3:0] volume,       // master volume 0-10 from iosys (hdmi.sv brings it into the pixel clock)
     input             audio_ready,
 
     // Settings and menu (iosys)
     input      [1:0]  shape,
     input             overlay,
+    input             osd_strip,        // with overlay: volume bar strip, the game keeps running
     output     [7:0]  overlay_x,
     output     [7:0]  overlay_y,
     input      [14:0] overlay_color,    // BGR5
@@ -73,7 +75,8 @@ end
 // Frame lock. The pause lasts an even number of cycles (pause_sync) so that the PPU's
 // SDRAM accesses stay in step. While the menu is shown the pause is not released, so the
 // game holds at line 1 of its next frame; go is cleared meanwhile, so the game resumes on
-// the frame_go after the menu closes, in step with HDMI.
+// the frame_go after the menu closes, in step with HDMI. Not for the strip (volume bar).
+wire menu = overlay & ~osd_strip;
 wire frame_go;
 reg  locked = 0;                        // paused once this frame
 reg  go;                                // frame_go seen during this pause
@@ -91,12 +94,12 @@ always @(posedge clk) begin
                     pause_sync <= 1'b0;
                     go <= 1'b0;
                 end
-            end else if (go && pause_sync && ~overlay) begin
+            end else if (go && pause_sync && ~menu) begin
                 pause <= 1'b0;
                 locked <= 1'b1;
             end
         end
-        if (overlay) go <= 1'b0;
+        if (menu) go <= 1'b0;
         else if (frame_go) go <= 1'b1;
         if (ys[7:0] == REARM_LINE) locked <= 1'b0;
     end
@@ -158,10 +161,11 @@ localparam FB_RGB15 = 0;               // 12-bit
 video_out #(.PIX_FMT(0), .DW(15), .AUDIO_RATE(AUDIO_RATE), .FRAMEBUFFER(FRAMEBUFFER), .FB_RGB15(FB_RGB15)) video (
     .clk(clk), .resetn(resetn),
     .pix_we(pix_we), .pix_y(pix_y), .pix_x(pix_x), .pix_data(pix_data),
-    .src_lines(src_lines), .src_active(running & (FRAMEBUFFER || ~overlay)), .shape(shape), .frame_go(frame_go),
-    .overlay(overlay),
+    .src_lines(src_lines), .src_active(running & (FRAMEBUFFER || ~menu)), .shape(shape), .frame_go(frame_go),
+    .overlay(overlay), .osd_strip(osd_strip),
     .hclk(hclk), .hclk5(hclk5),
     .clk_audio(clk_audio), .audio_l(audio_out_l), .audio_r(audio_out_r),
+    .volume(volume),
     .overlay_x(overlay_x), .overlay_y(overlay_y), .overlay_color(overlay_color),
     .tmds_clk_n(tmds_clk_n), .tmds_clk_p(tmds_clk_p), .tmds_d_n(tmds_d_n), .tmds_d_p(tmds_d_p)
 );

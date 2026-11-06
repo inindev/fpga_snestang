@@ -313,6 +313,8 @@ end
 
 wire sysclkf_ce, sysclkr_ce;
 wire overlay;
+wire osd_strip;                     // with overlay: volume bar strip, the game keeps running
+wire menu = overlay & ~osd_strip;   // menu shown, game paused
 
 `ifdef CHIP_DSPn
 parameter USE_DSPn=1;
@@ -360,7 +362,7 @@ main #(.USE_DSPn(USE_DSPn), .USE_GSU(USE_GSU)) main (
     .DOTCLK(dotclk), .RGB_OUT(rgb_out), .HBLANKn(hblankn),
     .VBLANKn(vblankn), .X_OUT(x_out), .Y_OUT(y_out),
 
-    .JOY1_DI(overlay?2'b11:snes_joy1_di), .JOY2_DI(overlay?2'b11:snes_joy2_di), .JOY_STRB(snes_joy_strb), 
+    .JOY1_DI(menu?2'b11:snes_joy1_di), .JOY2_DI(menu?2'b11:snes_joy2_di), .JOY_STRB(snes_joy_strb), 
     .JOY1_CLK(snes_joy1_clk), .JOY2_CLK(snes_joy2_clk), 
 
     .AUDIO_L(audio_l), .AUDIO_R(audio_r), .AUDIO_READY(audio_ready), .AUDIO_EN(audio_en),
@@ -577,6 +579,7 @@ always @(posedge mclk) begin
     end
 end
 
+wire [3:0] volume;              // master volume, iosys -> HDMI encoder
 `ifndef VERILATOR
 
 // Controller input
@@ -667,8 +670,9 @@ snes_video s2h (
     .xs(x_out), .ys(y_out), .snes_refresh(refresh),
     .pause(pause_snes_for_frame_sync),
     .audio_l(audio_l), .audio_r(audio_r), .audio_ready(audio_ready),
+    .volume(volume),
     .shape(2'd0),               // 8:7 pixels
-    .overlay(overlay), .overlay_x(overlay_x), .overlay_y(overlay_y),
+    .overlay(overlay), .osd_strip(osd_strip), .overlay_x(overlay_x), .overlay_y(overlay_y),
     .overlay_color(overlay_color),
     .hclk(hclk), .hclk5(hclk5),
     .tmds_clk_n(tmds_clk_n), .tmds_clk_p(tmds_clk_p),
@@ -691,9 +695,10 @@ snes2hdmi s2h(
 
 iosys_bl616 #(.CORE_ID(2), .FREQ(21_484_000)) iosys (
     .clk(mclk), .hclk(hclk), .resetn(resetn),
-    .overlay(overlay), .overlay_x(overlay_x), .overlay_y(overlay_y),
+    .overlay(overlay), .osd_strip(osd_strip), .overlay_x(overlay_x), .overlay_y(overlay_y),
     .overlay_color(overlay_color),
     .joy1(joy1_btns_ds2 | joy1_btns_snes | joy1_usb), .joy2(joy2_btns_ds2 | joy2_btns_snes | joy2_usb), .hid1(hid1), .hid2(hid2),
+    .volume(volume),
     .uart_tx(UART_TXD), .uart_rx(UART_RXD),
     .rom_loading(loading), .rom_do(loader_do), .rom_do_valid(loader_do_valid)
 );
