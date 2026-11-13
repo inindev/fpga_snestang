@@ -4,6 +4,7 @@
 `define SDRAM_3CH
 `define CHIP_DSPn
 // `define CHIP_GSU
+`define LED2               // two LEDs: led is 2 bits wide
 `define CONTROLLER_SNES
 `define USB1
 

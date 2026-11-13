@@ -27,8 +27,8 @@ module snestang_top (
     output [2:0] tmds_d_p,
     output [2:0] tmds_d_n,
 
-`ifdef NANO20K
-    // LED: the Nano 20K pin file has 2 (unplaced ones would land on TF card pins)
+`ifdef LED2
+    // LED: the Nano 20K and Primer 25K have 2 (an unplaced one would be put on a free pin)
     output [1:0] led,
 `else
     // LED
@@ -91,7 +91,9 @@ module snestang_top (
 
     // SDRAM
     output O_sdram_clk,
-    output O_sdram_cke,
+`ifdef NANO20K
+    output O_sdram_cke,             // in-package SDRAM; the other boards wire CKE high
+`endif
     output O_sdram_cs_n,            // chip select
     output O_sdram_cas_n,           // columns address select
     output O_sdram_ras_n,           // row address select
@@ -498,6 +500,10 @@ always @(posedge mclk) begin
         vram2_req <= ~vram2_req;
     end
 end
+
+`ifndef NANO20K
+wire O_sdram_cke;                   // no pin: an unplaced output would be put on a free pin
+`endif
 
 sdram_snes sdram(
     .clk(fclk), .mclk(mclk), .clkref(DOT_CLK_CE), .resetn(resetn), .busy(sdram_busy),
