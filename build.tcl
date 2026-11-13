@@ -1,6 +1,6 @@
 if {$argc == 0} {
     puts "Usage: $argv0 <device> [<controller>]"
-    puts "          device: nano20k, primer25k, mega60k, mega138k, console60k"
+    puts "          device: nano20k, primer25k, mega60k, mega138k, console60k, console138k"
     puts "      controller: snes, ds2"
     puts "Note: nano20k supports both controllers simultaneously, so build with just: gw_sh build.tcl nano20k"
     exit 1
@@ -95,8 +95,15 @@ if {$dev eq "nano20k"} {
     set_option -output_base_name snestang_${dev}_${controller}
 } elseif {$dev eq "console138k"} {
     set_device GW5AST-LV138PG484AC1/I0 -device_version B
-    add_file src/boards/console138k.v
-    add_file -type cst "src/boards/console.cst"
+    if {$controller eq "snes"} {
+        add_file src/boards/console138k_snescontroller.v
+        add_file -type cst "src/boards/console_snescontroller.cst"
+    } elseif {$controller eq "ds2" || $controller eq ""} {
+        add_file src/boards/console138k.v
+        add_file -type cst "src/boards/console.cst"
+    } else {
+        error "Unknown controller $controller"
+    }
     add_file -type verilog "src/pll/gowin_pll_27.v"
     add_file -type verilog "src/pll/gowin_pll_hdmi.v"
     add_file -type verilog "src/pll/gowin_pll_snes.v"
